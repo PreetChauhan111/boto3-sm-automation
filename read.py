@@ -10,10 +10,19 @@ def get_secret(secret_name, region_name="ap-south-1"):
         response = client.get_secret_value(SecretId=secret_name)
 
         if 'SecretString' in response:
-            return json.loads(response['SecretString'])
+            secret = response['SecretString']
+
+            # Try parsing JSON
+            try:
+                return json.loads(secret)
+            except json.JSONDecodeError:
+                return secret  # return as plain string
+
         else:
             return base64.b64decode(response['SecretBinary'])
 
     except ClientError as e:
         print(f"Error: {e}")
         raise
+
+print(get_secret("demo20260420065211386600000001"))
