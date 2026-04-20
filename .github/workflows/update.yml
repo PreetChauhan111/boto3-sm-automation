@@ -1,0 +1,34 @@
+name: "Update"
+
+on:
+  workflow_dispatch:
+    inputs:
+      secret_name:
+        description: "Name of the secret to update"
+        required: true
+        default: "demo20260420065211386600000001"
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          pip install boto3 python-dotenv
+
+      - name: Run update script
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: ap-south-1
+        run: |
+          python update.py "${{ github.event.inputs.secret_name }}"
